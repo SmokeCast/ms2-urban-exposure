@@ -1,10 +1,13 @@
 {
   "name": "ms2-urban-exposure",
   "version": "1.0.0",
-  "description": "",
+  "description": "Catálogo de ciudades de SmokeCast",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "npm run db:push && node --env-file-if-exists=.env index.js",
+    "dev": "npm run db:push && node --env-file-if-exists=.env --watch index.js",
+    "test": "node --test",
+    "db:push": "drizzle-kit push --force"
   },
   "keywords": [],
   "author": "",
@@ -12,9 +15,14 @@
   "type": "commonjs",
   "dependencies": {
     "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "pg": "^8.23.0",
-    "swagger-jsdoc": "^6.3.0",
-    "swagger-ui-express": "^5.0.1"
+    "drizzle-orm": "^0.44.7",
+    "express": "5.2.1",
+    "pg": "8.23.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.4"
   }
 }
