@@ -29,7 +29,9 @@ porque Haversine no es una operación CRUD genérica.
 En desarrollo, `npm start` ejecuta `drizzle-kit push --force` antes de iniciar la API.
 Eso crea o actualiza las tablas según `db/schema.js` sin que tengas que escribir SQL.
 El usuario de PostgreSQL necesita permisos de creación durante esta fase. La tabla
-`sensitive_sites` corresponde a los sitios sensibles de la propuesta; todavía no tiene endpoints.
+`sensitive_sites` contiene lugares vulnerables asociados a una ciudad (hospitales, escuelas, aeropuertos, estaciones de bomberos, etc.). Se puede consultar con `GET /api/v1/sensitive-sites?city_id=...` o `GET /api/v1/cities/{id}/sensitive-sites`.
+
+Documentación OpenAPI/Swagger: `http://127.0.0.1:8082/docs` · JSON: `http://127.0.0.1:8082/openapi.json`.
 
 Para aplicar el esquema por separado:
 
@@ -44,12 +46,20 @@ Configurar `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` y `DB_NAME` en `.env`.
 ## Endpoints
 
 - `GET /health`: 200 si PostgreSQL responde; 503 si no está disponible.
-- `GET /api/cities?limit=100&offset=0`: array ordenado por ID; límite máximo 500.
-- `GET /api/cities/near?lat=-12.04&lon=-77.03&radius_km=150`: hasta 20 ciudades por distancia.
-- `GET /api/cities/{id}`: detalle; 404 si no existe.
-- `POST /api/cities`: crear.
-- `PUT /api/cities/{id}`: reemplazar los campos de la ciudad.
-- `DELETE /api/cities/{id}`: eliminar; 409 si tiene sitios relacionados.
+- `GET /api/v1/cities?page=0&size=100`: array ordenado por ID; tamaño máximo 500.
+- `GET /api/v1/cities/near?lat=-12.04&lon=-77.03&radius_km=150`: hasta 20 ciudades por distancia.
+- `GET /api/v1/cities/{id}`: detalle; 404 si no existe.
+- `POST /api/v1/cities`: crear.
+- `POST /api/v1/cities/bulk`: inserta hasta 10 000 ciudades en una operación.
+- `PUT /api/v1/cities/{id}`: reemplazar los campos de la ciudad.
+- `DELETE /api/v1/cities/{id}`: eliminar; 409 si tiene sitios relacionados.
+- `GET /api/v1/sensitive-sites?page=0&size=100&city_id=1`: lista sitios sensibles, opcionalmente filtrados por ciudad.
+- `GET /api/v1/cities/{id}/sensitive-sites`: devuelve todos los sitios sensibles de una ciudad.
+- `POST /api/v1/sensitive-sites`, `PUT /api/v1/sensitive-sites/{id}` y `DELETE /api/v1/sensitive-sites/{id}`: administra sitios sensibles.
+- `POST /api/v1/sensitive-sites/bulk`: inserta hasta 10 000 sitios sensibles en una operación.
+
+Los endpoints bulk aceptan `{ "items": [ ... ] }` y devuelven la cantidad e IDs
+insertados. El seed continúa siendo el mecanismo para la carga masiva inicial.
 
 Cuerpo de POST/PUT:
 
